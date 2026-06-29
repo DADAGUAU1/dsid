@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel · DS ID</title>
+<style>
+  :root{ --azul:#2c5aa0; --azul2:#4a90e2; --verde:#1d9e75; --rojo:#c0392b; --gris:#718096; --borde:#d6e0ea; --bg:#eef3f8; }
+  *{ margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  body{ background:var(--bg); color:#1a202c; padding:16px; }
+  .wrap{ max-width:760px; margin:0 auto; }
+  .top{ background:linear-gradient(135deg,var(--azul2),var(--azul)); color:#fff; padding:20px 22px; border-radius:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+  .top h1{ font-size:20px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .top p{ font-size:13px; opacity:.9; margin-top:3px; }
+  .btn-new{ background:#fff; color:var(--azul); padding:10px 16px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; }
+  .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+  .stat{ background:#fff; border-radius:12px; padding:14px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .stat .n{ font-size:24px; font-weight:700; color:var(--azul); }
+  .stat .l{ font-size:12px; color:var(--gris); margin-top:2px; }
+  .warn{ background:#fff3cd; border:1px solid #ffe69c; color:#664d03; padding:12px 14px; border-radius:10px; font-size:13px; margin-bottom:16px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:14px; }
+  .pet{ background:#fff; border-radius:14px; padding:16px; box-shadow:0 2px 12px rgba(0,0,0,.05); }
+  .pet-head{ display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+  .pet-av{ width:52px; height:52px; border-radius:50%; background:#dbe9f7; display:flex; align-items:center; justify-content:center; font-size:26px; overflow:hidden; flex-shrink:0; }
+  .pet-av img{ width:100%; height:100%; object-fit:cover; }
+  .pet-name{ font-size:16px; font-weight:700; }
+  .pet-sub{ font-size:12px; color:var(--gris); }
+  .pet-id{ font-family:monospace; font-size:11px; color:var(--azul); margin-top:2px; }
+  .pet-body{ display:flex; gap:14px; align-items:center; }
+  .qr-mini{ width:96px; height:96px; flex-shrink:0; border:1px solid var(--borde); border-radius:8px; padding:5px; background:#fff; }
+  .qr-mini canvas{ width:100%!important; height:100%!important; }
+  .pet-actions{ flex:1; display:flex; flex-direction:column; gap:7px; }
+  .a-btn{ padding:9px 10px; border-radius:9px; border:1.5px solid var(--borde); background:#fff; font-size:12px; font-weight:600; cursor:pointer; text-decoration:none; text-align:center; color:var(--azul); display:flex; align-items:center; justify-content:center; gap:5px; }
+  .a-btn:hover{ background:#f0f7ff; }
+  .lost-row{ display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-radius:9px; background:#f7fafc; font-size:12px; }
+  .lost-row.on{ background:#fdecec; }
+  .switch{ position:relative; width:40px; height:22px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:#cbd5e0; border-radius:22px; cursor:pointer; transition:.2s; }
+  .slider:before{ content:""; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.2s; }
+  input:checked + .slider{ background:var(--rojo); }
+  input:checked + .slider:before{ transform:translateX(18px); }
+  .loader,.empty{ text-align:center; padding:60px 20px; color:var(--gris); }
+  .sp{ width:32px; height:32px; border:3px solid #d6e0ea; border-top-color:var(--azul); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 14px; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>🐾 DS ID — Panel</h1>
+      <p>Todas tus mascotas registradas</p>
+    </div>
+    <a href="registrar.html" class="btn-new">➕ Registrar nueva</a>
+  </div>
+
+  <div id="warn-config" class="warn" style="display:none;">
+    ⚠️ Falta configurar Supabase. Revisa la sección CONFIGURACIÓN del archivo.
+  </div>
+
+  <div class="stats" id="stats" style="display:none;">
+    <div class="stat"><div class="n" id="st-total">0</div><div class="l">Mascotas</div></div>
+    <div class="stat"><div class="n" id="st-perdidas">0</div><div class="l">Perdidas</div></div>
+    <div class="stat"><div class="n" id="st-fotos">0</div><div class="l">Con foto</div></div>
+  </div>
+
+  <div id="contenido">
+    <div class="loader"><div class="sp"></div>Cargando mascotas...</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="dsid-core.js"></script>
+<script>
+  /* ============================================================
+     ⚙️  CONFIGURACIÓN — YA ESTÁ LISTA (mismos datos que los otros archivos)
+     ============================================================ */
+  const SUPABASE_URL = "https://bwkjexxgbmuimphostxn.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_Hf-egqWEOiPiSs_fFR3eSQ_RFdHSZKg";
+  /* ============================================================ */
+
+  let sb = null;
+  const BASE = DSID.baseDir(location.href); // dirección del sitio, detectada sola
+
+  if (SUPABASE_URL.indexOf("PEGA_AQUI") === 0){
+    document.getElementById("warn-config").style.display = "block";
+    document.getElementById("contenido").innerHTML = "";
+  } else {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    cargar();
+  }
+
+  async function cargar(){
+    const { data, error } = await sb.from("mascotas").select("*").order("created_at", { ascending:false });
+    const cont = document.getElementById("contenido");
+
+    if (error){ cont.innerHTML = '<div class="empty">Error: '+DSID.escapeHtml(error.message)+'</div>'; return; }
+    if (!data || data.length === 0){
+      cont.innerHTML = '<div class="empty"><div style="font-size:48px;margin-bottom:10px;">🐶</div>Aún no hay mascotas registradas.<br><br><a href="registrar.html" class="btn-new" style="display:inline-block;background:var(--azul);color:#fff;">Registrar la primera</a></div>';
+      return;
+    }
+
+    // Estadísticas
+    document.getElementById("stats").style.display = "grid";
+    document.getElementById("st-total").textContent = data.length;
+    document.getElementById("st-perdidas").textContent = data.filter(m => m.perdida).length;
+    document.getElementById("st-fotos").textContent = data.filter(m => m.foto_url).length;
+
+    // Tarjetas
+    cont.innerHTML = '<div class="grid" id="grid"></div>';
+    const grid = document.getElementById("grid");
+    data.forEach(m => grid.appendChild(tarjeta(m)));
+    // Generar los QR después de insertar las tarjetas
+    data.forEach(m => {
+      const url = DSID.profileUrl(BASE, m.id);
+      const canvas = document.getElementById("qr-" + m.id);
+      if (canvas) QRCode.toCanvas(canvas, url, { errorCorrectionLevel:"H", margin:2, width:180, color:{dark:"#000",light:"#fff"} });
+    });
+  }
+
+  function tarjeta(m){
+    const e = DSID.escapeHtml;
+    const div = document.createElement("div");
+    div.className = "pet";
+    const avatar = m.foto_url ? '<img src="'+e(m.foto_url)+'">' : (m.especie==="Felina"?"🐱":"🐶");
+    const url = DSID.profileUrl(BASE, m.id);
+    div.innerHTML =
+      '<div class="pet-head">'+
+        '<div class="pet-av">'+avatar+'</div>'+
+        '<div><div class="pet-name">'+e(m.nombre)+'</div>'+
+        '<div class="pet-sub">'+[e(m.raza),e(m.sexo)].filter(Boolean).join(" · ")+'</div>'+
+        '<div class="pet-id">'+e(m.id)+'</div></div>'+
+      '</div>'+
+      '<div class="pet-body">'+
+        '<div class="qr-mini"><canvas id="qr-'+e(m.id)+'"></canvas></div>'+
+        '<div class="pet-actions">'+
+          '<a class="a-btn" href="'+url+'" target="_blank">👁️ Ver perfil</a>'+
+          '<button class="a-btn" onclick="descargarQR(\''+e(m.id)+'\',\''+e(m.nombre)+'\')">⬇️ Descargar QR</button>'+
+          '<div class="lost-row'+(m.perdida?" on":"")+'" id="lost-'+e(m.id)+'">'+
+            '<span>'+(m.perdida?"🔴 Perdida":"🟢 En casa")+'</span>'+
+            '<label class="switch"><input type="checkbox" '+(m.perdida?"checked":"")+' onchange="togglePerdida(\''+e(m.id)+'\', this.checked)"><span class="slider"></span></label>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    return div;
+  }
+
+  async function togglePerdida(id, perdida){
+    const row = document.getElementById("lost-" + id);
+    const { error } = await sb.from("mascotas").update({ perdida: perdida }).eq("id", id);
+    if (error){ alert("Error: " + error.message); return; }
+    row.classList.toggle("on", perdida);
+    row.querySelector("span").textContent = perdida ? "🔴 Perdida" : "🟢 En casa";
+    // Actualizar contador
+    const actual = parseInt(document.getElementById("st-perdidas").textContent) || 0;
+    document.getElementById("st-perdidas").textContent = perdida ? actual + 1 : Math.max(0, actual - 1);
+  }
+
+  function descargarQR(id, nombre){
+    const url = DSID.profileUrl(BASE, id);
+    const tmp = document.createElement("canvas");
+    QRCode.toCanvas(tmp, url, { errorCorrectionLevel:"H", margin:4, width:600, color:{dark:"#000",light:"#fff"} }, function(){
+      const a = document.createElement("a");
+      a.download = "qr-" + (nombre||"mascota").toLowerCase().replace(/\s+/g,"-") + ".png";
+      a.href = tmp.toDataURL("image/png");
+      a.click();
+    });
+  }
+</script>
+
+</body>
+</html>

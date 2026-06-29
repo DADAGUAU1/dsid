@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrar mascota · DS ID</title>
+<style>
+  :root{ --azul:#2c5aa0; --azul2:#4a90e2; --verde:#1d9e75; --rojo:#c0392b; --gris:#718096; --borde:#d6e0ea; --bg:#eef3f8; }
+  *{ margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  body{ background:var(--bg); color:#1a202c; padding:16px; }
+  .card{ max-width:520px; margin:0 auto; background:#fff; border-radius:18px; box-shadow:0 4px 24px rgba(0,0,0,.08); overflow:hidden; }
+  .head{ background:linear-gradient(135deg,var(--azul2),var(--azul)); color:#fff; padding:20px 22px; }
+  .head h1{ font-size:20px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .head p{ font-size:13px; opacity:.9; margin-top:4px; }
+  .body{ padding:20px 22px; }
+  .warn{ background:#fff3cd; border:1px solid #ffe69c; color:#664d03; padding:12px 14px; border-radius:10px; font-size:13px; margin-bottom:18px; line-height:1.5; }
+  .group{ margin-bottom:22px; }
+  .group-title{ font-size:12px; text-transform:uppercase; letter-spacing:.5px; color:var(--azul); font-weight:700; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--borde); }
+  label{ display:block; font-size:13px; color:#4a5568; margin-bottom:5px; font-weight:500; }
+  input,select,textarea{ width:100%; padding:11px 12px; border:1.5px solid var(--borde); border-radius:10px; font-size:14px; margin-bottom:13px; background:#fff; color:#1a202c; }
+  input:focus,select:focus,textarea:focus{ outline:none; border-color:var(--azul2); }
+  textarea{ resize:vertical; min-height:54px; }
+  .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .hint{ font-size:11px; color:var(--gris); margin-top:-9px; margin-bottom:13px; }
+  .foto-prev{ width:90px; height:90px; border-radius:50%; background:#dbe9f7; display:flex; align-items:center; justify-content:center; font-size:42px; overflow:hidden; margin:0 auto 10px; border:3px solid #fff; box-shadow:0 0 0 1px var(--borde); }
+  .foto-prev img{ width:100%; height:100%; object-fit:cover; }
+  .toggle-wrap{ display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#fdf0f0; border:1px solid #f5c6c6; border-radius:10px; }
+  .switch{ position:relative; width:46px; height:26px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:#cbd5e0; border-radius:26px; cursor:pointer; transition:.2s; }
+  .slider:before{ content:""; position:absolute; width:20px; height:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.2s; }
+  input:checked + .slider{ background:var(--rojo); }
+  input:checked + .slider:before{ transform:translateX(20px); }
+  .btn{ width:100%; padding:15px; background:var(--azul); color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:600; cursor:pointer; transition:.2s; }
+  .btn:hover{ background:#1e3f73; }
+  .btn:disabled{ opacity:.6; cursor:not-allowed; }
+  .req{ color:var(--rojo); }
+  /* Pantalla de éxito */
+  .exito{ display:none; text-align:center; padding:10px 0; }
+  .exito.show{ display:block; }
+  .exito h2{ color:var(--verde); font-size:22px; margin-bottom:6px; }
+  .exito .sub{ color:var(--gris); font-size:13px; margin-bottom:20px; }
+  #qrbox{ display:inline-block; padding:16px; background:#fff; border:1px solid var(--borde); border-radius:14px; margin-bottom:16px; }
+  .urlbox{ background:#f0f5fa; border-radius:8px; padding:10px 12px; font-family:monospace; font-size:11px; color:#2c5aa0; word-break:break-all; margin-bottom:14px; }
+  .btn-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+  .btn-sec{ padding:13px; border-radius:10px; border:1.5px solid var(--borde); background:#fff; color:var(--azul); font-size:13px; font-weight:600; cursor:pointer; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .btn-sec:hover{ background:#f0f7ff; }
+  .spinner{ display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-3px; margin-right:6px; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="head">
+    <h1>🐾 DS ID — Registrar mascota</h1>
+    <p>Llena los datos y genera el código QR para la marquilla</p>
+  </div>
+  <div class="body">
+
+    <div id="warn-config" class="warn" style="display:none;">
+      ⚠️ <strong>Falta configurar.</strong> Abre este archivo y pega tus datos de Supabase en la sección CONFIGURACIÓN (arriba del todo en el código).
+    </div>
+
+    <!-- ===== FORMULARIO ===== -->
+    <div id="form">
+
+      <div class="group">
+        <div class="group-title">Datos de la mascota</div>
+        <div class="foto-prev" id="fotoPrev">🐶</div>
+        <label>Foto (opcional)</label>
+        <input type="file" id="foto" accept="image/*">
+        <div class="hint">Si no subes foto, se usará un ícono. Recomendado: foto clara de la cara.</div>
+
+        <label>Nombre <span class="req">*</span></label>
+        <input type="text" id="nombre" placeholder="Ej: Nucita">
+
+        <div class="row">
+          <div>
+            <label>Especie</label>
+            <select id="especie">
+              <option value="Canina">Canina (perro)</option>
+              <option value="Felina">Felina (gato)</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </div>
+          <div>
+            <label>Sexo</label>
+            <select id="sexo">
+              <option>Hembra</option>
+              <option>Macho</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Raza</label>
+        <input type="text" id="raza" placeholder="Ej: Border Collie / Criollo">
+
+        <div class="row">
+          <div>
+            <label>Fecha de nacimiento</label>
+            <input type="date" id="fechanac">
+          </div>
+          <div>
+            <label>Ciudad</label>
+            <input type="text" id="ciudad" placeholder="Ej: Bucaramanga">
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Salud</div>
+        <div class="row">
+          <div>
+            <label>¿Esterilizado/a?</label>
+            <select id="esterilizada"><option>Sí</option><option>No</option><option>No sé</option></select>
+          </div>
+          <div>
+            <label>Alergias</label>
+            <input type="text" id="alergias" placeholder="Ej: Pollo / Ninguna">
+          </div>
+        </div>
+        <label>Medicación actual</label>
+        <input type="text" id="medicacion" placeholder="Ej: Ninguna">
+        <label>Notas de comportamiento</label>
+        <textarea id="comportamiento" placeholder="Ej: Asustadiza con extraños, acércate despacio"></textarea>
+
+        <label>Vacunas (estado y fecha)</label>
+        <div class="row">
+          <input type="text" id="vacuna_rabia" placeholder="Rabia: Vigente marzo 2026">
+          <input type="text" id="vacuna_poli" placeholder="Polivalente: Vigente ene 2026">
+        </div>
+        <input type="text" id="vacuna_despara" placeholder="Desparasitación: Próxima junio 2026">
+      </div>
+
+      <div class="group">
+        <div class="group-title">Microchip (opcional)</div>
+        <label>Número ISO</label>
+        <input type="text" id="microchip" placeholder="Ej: 982000412345678">
+        <div class="row">
+          <div>
+            <label>Veterinaria</label>
+            <input type="text" id="chip_vet" placeholder="Dónde se implantó">
+          </div>
+          <div>
+            <label>Fecha</label>
+            <input type="text" id="chip_fecha" placeholder="Ej: 15 marzo 2025">
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Contactos de emergencia</div>
+        <label>Contacto principal — Nombre <span class="req">*</span></label>
+        <input type="text" id="c1n" placeholder="Ej: Valentina Mendoza">
+        <div class="row">
+          <div>
+            <label>Relación</label>
+            <input type="text" id="c1r" placeholder="Ej: Dueña" value="Dueño/a">
+          </div>
+          <div>
+            <label>Teléfono / WhatsApp <span class="req">*</span></label>
+            <input type="tel" id="c1t" placeholder="3001234567">
+          </div>
+        </div>
+        <div class="hint">Este número recibe los mensajes de WhatsApp y las llamadas.</div>
+
+        <label>Contacto secundario — Nombre (opcional)</label>
+        <input type="text" id="c2n" placeholder="Ej: Carlos Mendoza">
+        <div class="row">
+          <div>
+            <label>Relación</label>
+            <input type="text" id="c2r" placeholder="Ej: Padre">
+          </div>
+          <div>
+            <label>Teléfono / WhatsApp</label>
+            <input type="tel" id="c2t" placeholder="3109876543">
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Estado</div>
+        <div class="toggle-wrap">
+          <div>
+            <div style="font-weight:600; font-size:14px; color:#7d2020;">Marcar como perdida</div>
+            <div style="font-size:12px; color:#a04040;">Muestra alerta roja al escanear</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="perdida"><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <button class="btn" id="guardar" onclick="guardar()">Guardar y generar QR</button>
+    </div>
+
+    <!-- ===== PANTALLA DE ÉXITO ===== -->
+    <div class="exito" id="exito">
+      <h2>✓ ¡Mascota registrada!</h2>
+      <div class="sub">Este es el QR para imprimir en la marquilla</div>
+      <div id="qrbox"></div>
+      <div class="urlbox" id="urlFinal"></div>
+      <div class="btn-row">
+        <button class="btn-sec" onclick="descargarQR()">⬇️ Descargar QR</button>
+        <a class="btn-sec" id="verPerfil" target="_blank">👁️ Ver perfil</a>
+      </div>
+      <div class="btn-row">
+        <button class="btn-sec" onclick="copiarUrl()" id="btnCopiar">🔗 Copiar enlace</button>
+        <button class="btn-sec" onclick="otra()">➕ Registrar otra</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Librerías -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="dsid-core.js"></script>
+<script>
+  /* ============================================================
+     ⚙️  CONFIGURACIÓN  — YA ESTÁ LISTA con tus datos de Supabase
+     (Si algún día cambias de proyecto, reemplaza estas 2 líneas)
+     ============================================================ */
+  const SUPABASE_URL  = "https://bwkjexxgbmuimphostxn.supabase.co";
+  const SUPABASE_KEY  = "sb_publishable_Hf-egqWEOiPiSs_fFR3eSQ_RFdHSZKg";
+  /* La dirección del sitio se detecta automáticamente, no hay que configurarla */
+  /* ============================================================ */
+
+  let sb = null, qrCanvas = null, urlActual = "";
+
+  // Avisar si falta configuración
+  if (SUPABASE_URL.indexOf("PEGA_AQUI") === 0 || SUPABASE_KEY.indexOf("PEGA_AQUI") === 0) {
+    document.getElementById("warn-config").style.display = "block";
+  } else {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+
+  // Vista previa de la foto
+  document.getElementById("foto").addEventListener("change", function(e){
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = ev => { document.getElementById("fotoPrev").innerHTML = '<img src="'+ev.target.result+'">'; };
+    r.readAsDataURL(f);
+  });
+
+  async function guardar(){
+    const nombre = document.getElementById("nombre").value.trim();
+    const c1n = document.getElementById("c1n").value.trim();
+    const c1t = document.getElementById("c1t").value.trim();
+    if (!nombre){ alert("El nombre de la mascota es obligatorio."); return; }
+    if (!c1n || !c1t){ alert("El contacto principal (nombre y teléfono) es obligatorio."); return; }
+    if (!sb){ alert("Falta configurar Supabase. Revisa la sección CONFIGURACIÓN del archivo."); return; }
+
+    const btn = document.getElementById("guardar");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Guardando...';
+
+    try {
+      const id = DSID.generateId(nombre);
+
+      // 1) Subir foto (si hay)
+      let fotoUrl = "";
+      const fileInput = document.getElementById("foto");
+      if (fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+        const path = id + "." + ext;
+        const up = await sb.storage.from("fotos").upload(path, file, { upsert:true });
+        if (up.error) { console.warn("Foto no subida:", up.error.message); }
+        else { fotoUrl = sb.storage.from("fotos").getPublicUrl(path).data.publicUrl; }
+      }
+
+      // 2) Guardar el registro
+      const fila = {
+        id: id,
+        nombre: nombre,
+        especie: document.getElementById("especie").value,
+        raza: document.getElementById("raza").value.trim(),
+        sexo: document.getElementById("sexo").value,
+        fecha_nacimiento: document.getElementById("fechanac").value,
+        ciudad: document.getElementById("ciudad").value.trim(),
+        foto_url: fotoUrl,
+        perdida: document.getElementById("perdida").checked,
+        esterilizada: document.getElementById("esterilizada").value,
+        alergias: document.getElementById("alergias").value.trim(),
+        medicacion: document.getElementById("medicacion").value.trim(),
+        comportamiento: document.getElementById("comportamiento").value.trim(),
+        microchip: document.getElementById("microchip").value.trim(),
+        chip_vet: document.getElementById("chip_vet").value.trim(),
+        chip_fecha: document.getElementById("chip_fecha").value.trim(),
+        dueno_nombre: c1n,
+        dueno_telefono: c1t,
+        dueno_whatsapp: DSID.sanitizePhone(c1t),
+        contacto2_nombre: document.getElementById("c2n").value.trim(),
+        contacto2_telefono: document.getElementById("c2t").value.trim(),
+        contacto2_whatsapp: DSID.sanitizePhone(document.getElementById("c2t").value.trim()),
+        vacuna_rabia: document.getElementById("vacuna_rabia").value.trim(),
+        vacuna_polivalente: document.getElementById("vacuna_poli").value.trim(),
+        vacuna_despara: document.getElementById("vacuna_despara").value.trim(),
+        c1_relacion: document.getElementById("c1r").value.trim(),
+        c2_relacion: document.getElementById("c2r").value.trim()
+      };
+
+      const { error } = await sb.from("mascotas").insert(fila);
+      if (error) throw error;
+
+      // 3) Generar QR (la dirección del sitio se detecta sola desde esta página)
+      urlActual = DSID.profileUrl(DSID.baseDir(location.href), id);
+      mostrarExito(urlActual, nombre);
+
+    } catch (e) {
+      alert("Error al guardar: " + (e.message || e));
+      btn.disabled = false;
+      btn.innerHTML = "Guardar y generar QR";
+    }
+  }
+
+  function mostrarExito(url, nombre){
+    document.getElementById("form").style.display = "none";
+    document.getElementById("exito").classList.add("show");
+    document.getElementById("urlFinal").textContent = url;
+    document.getElementById("verPerfil").href = url;
+
+    const box = document.getElementById("qrbox");
+    box.innerHTML = "";
+    qrCanvas = document.createElement("canvas");
+    box.appendChild(qrCanvas);
+    QRCode.toCanvas(qrCanvas, url, { errorCorrectionLevel:"H", margin:4, width:280, color:{dark:"#000",light:"#fff"} });
+  }
+
+  function descargarQR(){
+    const nombre = (document.getElementById("nombre").value.trim() || "mascota").toLowerCase().replace(/\s+/g,"-");
+    // Re-generar en alta resolución (600px) para impresión
+    const tmp = document.createElement("canvas");
+    QRCode.toCanvas(tmp, urlActual, { errorCorrectionLevel:"H", margin:4, width:600, color:{dark:"#000",light:"#fff"} }, function(){
+      const a = document.createElement("a");
+      a.download = "qr-" + nombre + ".png";
+      a.href = tmp.toDataURL("image/png");
+      a.click();
+    });
+  }
+
+  function copiarUrl(){
+    navigator.clipboard.writeText(urlActual).then(()=>{
+      const b = document.getElementById("btnCopiar");
+      const t = b.innerHTML; b.innerHTML = "✓ Copiado";
+      setTimeout(()=>b.innerHTML=t, 1500);
+    });
+  }
+
+  function otra(){ location.reload(); }
+</script>
+
+</body>
+</html>
