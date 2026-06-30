@@ -4,48 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel · DS ID</title>
-<style>
-  :root{ --azul:#2c5aa0; --azul2:#4a90e2; --verde:#1d9e75; --rojo:#c0392b; --gris:#718096; --borde:#d6e0ea; --bg:#eef3f8; }
-  *{ margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
-  body{ background:var(--bg); color:#1a202c; padding:16px; }
-  .wrap{ max-width:760px; margin:0 auto; }
-  .top{ background:linear-gradient(135deg,var(--azul2),var(--azul)); color:#fff; padding:20px 22px; border-radius:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-  .top h1{ font-size:20px; font-weight:700; display:flex; align-items:center; gap:8px; }
-  .top p{ font-size:13px; opacity:.9; margin-top:3px; }
-  .btn-new{ background:#fff; color:var(--azul); padding:10px 16px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; }
-  .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
-  .stat{ background:#fff; border-radius:12px; padding:14px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,.04); }
-  .stat .n{ font-size:24px; font-weight:700; color:var(--azul); }
-  .stat .l{ font-size:12px; color:var(--gris); margin-top:2px; }
-  .warn{ background:#fff3cd; border:1px solid #ffe69c; color:#664d03; padding:12px 14px; border-radius:10px; font-size:13px; margin-bottom:16px; }
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:14px; }
-  .pet{ background:#fff; border-radius:14px; padding:16px; box-shadow:0 2px 12px rgba(0,0,0,.05); }
-  .pet-head{ display:flex; gap:12px; align-items:center; margin-bottom:12px; }
-  .pet-av{ width:52px; height:52px; border-radius:50%; background:#dbe9f7; display:flex; align-items:center; justify-content:center; font-size:26px; overflow:hidden; flex-shrink:0; }
-  .pet-av img{ width:100%; height:100%; object-fit:cover; }
-  .pet-name{ font-size:16px; font-weight:700; }
-  .pet-sub{ font-size:12px; color:var(--gris); }
-  .pet-id{ font-family:monospace; font-size:11px; color:var(--azul); margin-top:2px; }
-  .pet-body{ display:flex; gap:14px; align-items:center; }
-  .qr-mini{ width:96px; height:96px; flex-shrink:0; border:1px solid var(--borde); border-radius:8px; padding:5px; background:#fff; }
-  .qr-mini canvas{ width:100%!important; height:100%!important; }
-  .pet-actions{ flex:1; display:flex; flex-direction:column; gap:7px; }
-  .a-btn{ padding:9px 10px; border-radius:9px; border:1.5px solid var(--borde); background:#fff; font-size:12px; font-weight:600; cursor:pointer; text-decoration:none; text-align:center; color:var(--azul); display:flex; align-items:center; justify-content:center; gap:5px; }
-  .a-btn:hover{ background:#f0f7ff; }
-  .a-del{ color:var(--rojo); border-color:#f0c0c0; }
-  .a-del:hover{ background:#fdecec; }
-  .lost-row{ display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-radius:9px; background:#f7fafc; font-size:12px; }
-  .lost-row.on{ background:#fdecec; }
-  .switch{ position:relative; width:40px; height:22px; flex-shrink:0; }
-  .switch input{ opacity:0; width:0; height:0; }
-  .slider{ position:absolute; inset:0; background:#cbd5e0; border-radius:22px; cursor:pointer; transition:.2s; }
-  .slider:before{ content:""; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.2s; }
-  input:checked + .slider{ background:var(--rojo); }
-  input:checked + .slider:before{ transform:translateX(18px); }
-  .loader,.empty{ text-align:center; padding:60px 20px; color:var(--gris); }
-  .sp{ width:32px; height:32px; border:3px solid #d6e0ea; border-top-color:var(--azul); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 14px; }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-</style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%278%27%20fill%3D%27%230F756B%27/%3E%3Cg%20fill%3D%27%23ffffff%27%3E%3Cellipse%20cx%3D%2716%27%20cy%3D%2720%27%20rx%3D%276%27%20ry%3D%275%27/%3E%3Ccircle%20cx%3D%279%27%20cy%3D%2713%27%20r%3D%272.4%27/%3E%3Ccircle%20cx%3D%2714%27%20cy%3D%2710%27%20r%3D%272.4%27/%3E%3Ccircle%20cx%3D%2719%27%20cy%3D%2710%27%20r%3D%272.4%27/%3E%3Ccircle%20cx%3D%2723%27%20cy%3D%2713%27%20r%3D%272.4%27/%3E%3C/g%3E%3C/svg%3E">
+<meta name="theme-color" content="#0F756B">
+<meta property="og:title" content="DS ID — Identificación inteligente de mascotas">
+<meta property="og:description" content="Placa con QR. Si tu mascota se pierde, quien la encuentre puede contactarte al instante.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
@@ -85,6 +49,7 @@ Minimum version required to store current data is: `+i+`.
 `;return typeof r=="function"&&r(null,h),h}});var Nn=g(O=>{var Tn=_t(),St=Te(),be=Ne(),In=Pe();function Pt(n,t,e,r,o){let i=[].slice.call(arguments,1),s=i.length,u=typeof i[s-1]=="function";if(!u&&!Tn())throw new Error("Callback required as last argument");if(u){if(s<2)throw new Error("Too few arguments provided");s===2?(o=e,e=t,t=r=void 0):s===3&&(t.getContext&&typeof o>"u"?(o=r,r=void 0):(o=r,r=e,e=t,t=void 0))}else{if(s<1)throw new Error("Too few arguments provided");return s===1?(e=t,t=r=void 0):s===2&&!t.getContext&&(r=e,e=t,t=void 0),new Promise(function(c,l){try{let a=St.create(e,r);c(n(a,t,r))}catch(a){l(a)}})}try{let c=St.create(e,r);o(null,n(c,t,r))}catch(c){o(c)}}O.create=St.create;O.toCanvas=Pt.bind(null,be.render);O.toDataURL=Pt.bind(null,be.renderToDataURL);O.toString=Pt.bind(null,function(n,t,e){return In.render(n,e)})});return Nn();})();
 
 </script>
+<script src="dsid-ui.js"></script>
 <script src="dsid-core.js"></script>
 <script>
   /* ============================================================
@@ -165,7 +130,7 @@ Minimum version required to store current data is: `+i+`.
   async function togglePerdida(id, perdida){
     const row = document.getElementById("lost-" + id);
     const { error } = await sb.from("mascotas").update({ perdida: perdida }).eq("id", id);
-    if (error){ alert("Error: " + error.message); return; }
+    if (error){ DSIDUI.toast("No se pudo cambiar el estado: " + error.message,"err"); return; }
     row.classList.toggle("on", perdida);
     row.querySelector("span").textContent = perdida ? "🔴 Perdida" : "🟢 En casa";
     // Actualizar contador
@@ -174,13 +139,14 @@ Minimum version required to store current data is: `+i+`.
   }
 
   async function eliminar(id, nombre){
-    if (!confirm("¿Seguro que quieres eliminar a " + nombre + "?\n\nEsta acción no se puede deshacer y el QR de su placa dejará de funcionar.")) return;
+    if (!(await DSIDUI.confirmar({titulo:"¿Eliminar a "+nombre+"?", texto:"Esta acción no se puede deshacer y el QR de su placa dejará de funcionar.", confirmar:"Eliminar", peligro:true}))) return;
     const { error } = await sb.from("mascotas").delete().eq("id", id);
-    if (error){ alert("Error al eliminar: " + error.message); return; }
+    if (error){ DSIDUI.toast("No se pudo eliminar: " + error.message,"err"); return; }
     const card = document.getElementById("pet-card-" + id);
     if (card) card.remove();
     const total = parseInt(document.getElementById("st-total").textContent) || 1;
     document.getElementById("st-total").textContent = Math.max(0, total - 1);
+    DSIDUI.toast(nombre + " fue eliminada","ok");
   }
 
   function descargarQR(id, nombre){

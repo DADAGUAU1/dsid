@@ -4,69 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mi mascota · DS ID</title>
-<style>
-  :root{ --azul:#2c5aa0; --azul2:#4a90e2; --verde:#1d9e75; --rojo:#c0392b; --gris:#718096; --borde:#d6e0ea; --bg:#eef3f8; }
-  *{ margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
-  body{ background:var(--bg); color:#1a202c; padding:16px; }
-  .card{ max-width:520px; margin:0 auto; background:#fff; border-radius:18px; box-shadow:0 4px 24px rgba(0,0,0,.08); overflow:hidden; }
-  .head{ background:linear-gradient(135deg,var(--azul2),var(--azul)); color:#fff; padding:18px 22px; display:flex; justify-content:space-between; align-items:center; }
-  .head h1{ font-size:19px; font-weight:700; display:flex; align-items:center; gap:8px; }
-  .head .user{ font-size:12px; opacity:.9; text-align:right; }
-  .head .user a{ color:#fff; text-decoration:underline; cursor:pointer; display:block; margin-top:2px; }
-  .body{ padding:22px; }
-  h2{ font-size:18px; margin-bottom:4px; }
-  .muted{ color:var(--gris); font-size:13px; margin-bottom:18px; }
-  label{ display:block; font-size:13px; color:#4a5568; margin-bottom:5px; font-weight:500; }
-  input,select,textarea{ width:100%; padding:11px 12px; border:1.5px solid var(--borde); border-radius:10px; font-size:14px; margin-bottom:13px; background:#fff; color:#1a202c; }
-  input:focus,select:focus,textarea:focus{ outline:none; border-color:var(--azul2); }
-  textarea{ resize:vertical; min-height:54px; }
-  .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .btn{ width:100%; padding:14px; background:var(--azul); color:#fff; border:none; border-radius:11px; font-size:15px; font-weight:600; cursor:pointer; }
-  .btn:hover{ background:#1e3f73; }
-  .btn:disabled{ opacity:.6; cursor:not-allowed; }
-  .btn-2{ background:#fff; color:var(--azul); border:1.5px solid var(--borde); margin-top:8px; }
-  .btn-2:hover{ background:#f0f7ff; }
-  .btn-del{ background:#fff; color:var(--rojo); border:1.5px solid #f0c0c0; margin-top:8px; }
-  .btn-del:hover{ background:#fdecec; }
-  .link{ text-align:center; font-size:13px; color:var(--azul); cursor:pointer; margin-top:14px; }
-  .link:hover{ text-decoration:underline; }
-  .msg{ padding:11px 13px; border-radius:9px; font-size:13px; margin-bottom:14px; }
-  .msg-err{ background:#fdecec; color:#a02020; }
-  .msg-ok{ background:#e8f5e9; color:#2e7d32; }
-  .group-title{ font-size:12px; text-transform:uppercase; letter-spacing:.5px; color:var(--azul); font-weight:700; margin:18px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--borde); }
-  .req{ color:var(--rojo); }
-  .hint{ font-size:11px; color:var(--gris); margin-top:-9px; margin-bottom:13px; }
-  /* Lista de mascotas */
-  .pet{ border:1.5px solid var(--borde); border-radius:14px; padding:14px; margin-bottom:12px; display:flex; gap:14px; align-items:center; }
-  .pet-av{ width:54px; height:54px; border-radius:50%; background:#dbe9f7; display:flex; align-items:center; justify-content:center; font-size:26px; overflow:hidden; flex-shrink:0; }
-  .pet-av img{ width:100%; height:100%; object-fit:cover; }
-  .pet-info{ flex:1; }
-  .pet-name{ font-size:16px; font-weight:700; }
-  .pet-sub{ font-size:12px; color:var(--gris); }
-  .pet-lost{ display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; margin-top:4px; }
-  .lost-yes{ background:#fdecec; color:var(--rojo); }
-  .lost-no{ background:#e8f5e9; color:#2e7d32; }
-  .pet-btns{ display:flex; flex-direction:column; gap:6px; }
-  .mini{ padding:7px 12px; font-size:12px; border-radius:8px; border:1.5px solid var(--borde); background:#fff; color:var(--azul); cursor:pointer; text-decoration:none; text-align:center; white-space:nowrap; }
-  .mini:hover{ background:#f0f7ff; }
-  .foto-prev{ width:80px; height:80px; border-radius:50%; background:#dbe9f7; display:flex; align-items:center; justify-content:center; font-size:38px; overflow:hidden; margin:0 auto 10px; }
-  .foto-prev img{ width:100%; height:100%; object-fit:cover; }
-  .toggle-wrap{ display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#fdf0f0; border:1px solid #f5c6c6; border-radius:10px; margin-bottom:13px; }
-  .switch{ position:relative; width:46px; height:26px; flex-shrink:0; }
-  .switch input{ opacity:0; width:0; height:0; }
-  .slider{ position:absolute; inset:0; background:#cbd5e0; border-radius:26px; cursor:pointer; transition:.2s; }
-  .slider:before{ content:""; position:absolute; width:20px; height:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.2s; }
-  input:checked + .slider{ background:var(--rojo); }
-  input:checked + .slider:before{ transform:translateX(20px); }
-  #qrbox{ text-align:center; margin:14px 0; }
-  #qrbox canvas{ border:1px solid var(--borde); border-radius:12px; padding:10px; }
-  .urlbox{ background:#f0f5fa; border-radius:8px; padding:10px 12px; font-family:monospace; font-size:11px; color:var(--azul); word-break:break-all; margin-bottom:12px; text-align:center; }
-  .loader{ text-align:center; padding:50px 20px; color:var(--gris); }
-  .sp{ width:30px; height:30px; border:3px solid var(--borde); border-top-color:var(--azul); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 12px; }
-  .spinner-inline{ display:inline-block; width:15px; height:15px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-2px; margin-right:6px; }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-  .warn{ background:#fff3cd; border:1px solid #ffe69c; color:#664d03; padding:12px 14px; border-radius:10px; font-size:13px; }
-</style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%278%27%20fill%3D%27%230F756B%27/%3E%3Cg%20fill%3D%27%23ffffff%27%3E%3Cellipse%20cx%3D%2716%27%20cy%3D%2720%27%20rx%3D%276%27%20ry%3D%275%27/%3E%3Ccircle%20cx%3D%279%27%20cy%3D%2713%27%20r%3D%272.4%27/%3E%3Ccircle%20cx%3D%2714%27%20cy%3D%2710%27%20r%3D%272.4%27/%3E%3Ccircle%20cx%3D%2719%27%20cy%3D%2710%27%20r%3D%272.4%27/%3E%3Ccircle%20cx%3D%2723%27%20cy%3D%2713%27%20r%3D%272.4%27/%3E%3C/g%3E%3C/svg%3E">
+<meta name="theme-color" content="#0F756B">
+<meta property="og:title" content="DS ID — Identificación inteligente de mascotas">
+<meta property="og:description" content="Placa con QR. Si tu mascota se pierde, quien la encuentre puede contactarte al instante.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
@@ -91,6 +34,7 @@ Minimum version required to store current data is: `+i+`.
 `;return typeof r=="function"&&r(null,h),h}});var Nn=g(O=>{var Tn=_t(),St=Te(),be=Ne(),In=Pe();function Pt(n,t,e,r,o){let i=[].slice.call(arguments,1),s=i.length,u=typeof i[s-1]=="function";if(!u&&!Tn())throw new Error("Callback required as last argument");if(u){if(s<2)throw new Error("Too few arguments provided");s===2?(o=e,e=t,t=r=void 0):s===3&&(t.getContext&&typeof o>"u"?(o=r,r=void 0):(o=r,r=e,e=t,t=void 0))}else{if(s<1)throw new Error("Too few arguments provided");return s===1?(e=t,t=r=void 0):s===2&&!t.getContext&&(r=e,e=t,t=void 0),new Promise(function(c,l){try{let a=St.create(e,r);c(n(a,t,r))}catch(a){l(a)}})}try{let c=St.create(e,r);o(null,n(c,t,r))}catch(c){o(c)}}O.create=St.create;O.toCanvas=Pt.bind(null,be.render);O.toDataURL=Pt.bind(null,be.renderToDataURL);O.toString=Pt.bind(null,function(n,t,e){return In.render(n,e)})});return Nn();})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="dsid-ui.js"></script>
 <script src="dsid-core.js"></script>
 <script>
   /* ============================================================
@@ -295,10 +239,10 @@ Minimum version required to store current data is: `+i+`.
 
   async function eliminarMascota(){
     if (!editandoId) return;
-    if (!confirm("¿Seguro que quieres eliminar esta mascota?\n\nNo se puede deshacer y el QR de su placa dejará de funcionar.")) return;
+    if (!(await DSIDUI.confirmar({titulo:"¿Eliminar esta mascota?", texto:"No se puede deshacer y el QR de su placa dejará de funcionar.", confirmar:"Eliminar", peligro:true}))) return;
     const { error } = await sb.from("mascotas").delete().eq("id", editandoId);
-    if (error){ formMsg("Error al eliminar: " + error.message); return; }
-    verLista();
+    if (error){ DSIDUI.toast("No se pudo eliminar: " + error.message,"err"); return; }
+    verLista(); DSIDUI.toast("Mascota eliminada","ok");
   }
 
   async function guardar(){
@@ -356,7 +300,7 @@ Minimum version required to store current data is: `+i+`.
       if (editandoId){
         const { error } = await sb.from("mascotas").update(fila).eq("id", editandoId);
         if (error) throw error;
-        verLista();
+        verLista(); DSIDUI.toast("Cambios guardados","ok");
       } else {
         fila.id = DSID.generateId(nombre);
         const { error } = await sb.from("mascotas").insert(fila);
