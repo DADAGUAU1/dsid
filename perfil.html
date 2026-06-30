@@ -151,26 +151,41 @@
 
   function compartirUbicacion(){
     const btn = document.getElementById("btnLoc");
-    const msg = document.getElementById("locMsg");
     if (!navigator.geolocation){ DSIDUI.toast("Tu navegador no permite ubicación.","err"); return; }
-    btn.textContent = "⏳ Obteniendo..."; btn.disabled = true;
+    btn.textContent = "⏳ Obteniendo ubicación..."; btn.disabled = true;
     navigator.geolocation.getCurrentPosition(
       function(pos){
-        const lat = pos.coords.latitude.toFixed(6), lng = pos.coords.longitude.toFixed(6);
-        const mapa = `https://maps.google.com/?q=${lat},${lng}`;
-        const txt = "¡Encontré a "+mascota.nombre+"! Mi ubicación: "+mapa;
-        window.open("https://wa.me/"+DSID.sanitizePhone(mascota.whatsapp)+"?text="+encodeURIComponent(txt), "_blank");
-        btn.textContent = "✓ Ubicación enviada";
-        btn.style.background = "var(--teal-tint)"; btn.style.color = "var(--teal-deep)"; btn.style.borderColor = "#A9D9D0";
-        msg.classList.add("show");
+        enviarUbicacionWhatsApp(pos.coords.latitude.toFixed(6), pos.coords.longitude.toFixed(6));
       },
-      function(err){ DSIDUI.toast("No se pudo obtener la ubicación: "+err.message,"err"); btn.textContent="📍 Enviar ubicación"; btn.disabled=false; }
-  {
-    enableHighAccuracy: true,
-    timeout: 10000,
-    maximumAge: 0
+      function(err){
+        btn.textContent = "📍 Enviar ubicación"; btn.disabled = false;
+        const motivo = err && err.code === 1
+          ? "Diste 'bloquear' al permiso de ubicación. Actívalo e intenta de nuevo."
+          : "No se pudo obtener la ubicación. Intenta de nuevo.";
+        DSIDUI.toast(motivo, "err");
+      },
+      { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
+    );
   }
-);
+
+  // Abre WhatsApp con la ubicación. Navega en la MISMA pestaña a propósito:
+  // el celular bloquea window.open desde la respuesta del GPS, location.href no.
+  function enviarUbicacionWhatsApp(lat, lng){
+    const mascota = window._mascota || {};
+    const mapa = DSID.buildMaps(lat, lng);
+    const txt = "¡Encontré a " + (mascota.nombre || "tu mascota") + "! Esta es mi ubicación: " + mapa;
+    const url = "https://wa.me/" + DSID.sanitizePhone(mascota.whatsapp) + "?text=" + encodeURIComponent(txt);
+    const btn = document.getElementById("btnLoc");
+    const msg = document.getElementById("locMsg");
+    if (btn){
+      btn.textContent = "✓ Abriendo WhatsApp...";
+      btn.style.background = "var(--teal-tint)"; btn.style.color = "var(--teal-deep)"; btn.style.borderColor = "#A9D9D0";
+    }
+    if (msg) msg.classList.add("show");
+    window.location.href = url;
+    return url;
+  }
+
 </script>
 
 </body>
