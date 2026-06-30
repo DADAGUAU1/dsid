@@ -157,7 +157,7 @@
     navigator.geolocation.getCurrentPosition(
       function(pos){
         const lat = pos.coords.latitude.toFixed(6), lng = pos.coords.longitude.toFixed(6);
-        const mapa = DSID.buildMaps(lat, lng), mascota = window._mascota;
+        const mapa = `https://maps.google.com/?q=${lat},${lng}`;
         const txt = "¡Encontré a "+mascota.nombre+"! Mi ubicación: "+mapa;
         window.open("https://wa.me/"+DSID.sanitizePhone(mascota.whatsapp)+"?text="+encodeURIComponent(txt), "_blank");
         btn.textContent = "✓ Ubicación enviada";
