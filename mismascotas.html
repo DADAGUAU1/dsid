@@ -26,6 +26,8 @@
   .btn:disabled{ opacity:.6; cursor:not-allowed; }
   .btn-2{ background:#fff; color:var(--azul); border:1.5px solid var(--borde); margin-top:8px; }
   .btn-2:hover{ background:#f0f7ff; }
+  .btn-del{ background:#fff; color:var(--rojo); border:1.5px solid #f0c0c0; margin-top:8px; }
+  .btn-del:hover{ background:#fdecec; }
   .link{ text-align:center; font-size:13px; color:var(--azul); cursor:pointer; margin-top:14px; }
   .link:hover{ text-decoration:underline; }
   .msg{ padding:11px 13px; border-radius:9px; font-size:13px; margin-bottom:14px; }
@@ -277,6 +279,7 @@ Minimum version required to store current data is: `+i+`.
       '<label class="switch"><input type="checkbox" id="perdida"'+(m.perdida?" checked":"")+'><span class="slider"></span></label></div>'+
 
       '<button class="btn" id="saveBtn" onclick="guardar()">'+(editandoId?"Guardar cambios":"Registrar y generar QR")+'</button>'+
+      (editandoId ? '<button class="btn btn-del" onclick="eliminarMascota()">🗑️ Eliminar esta mascota</button>' : '')+
       '<button class="btn btn-2" onclick="verLista()">← Cancelar</button>';
 
     document.getElementById("foto").addEventListener("change", function(e){
@@ -289,6 +292,14 @@ Minimum version required to store current data is: `+i+`.
 
   function opt(lista, sel){ return lista.map(o => '<option'+(o===sel?" selected":"")+'>'+o+'</option>').join(""); }
   function formMsg(t,tipo){ document.getElementById("formMsg").innerHTML = '<div class="msg '+(tipo==="ok"?"msg-ok":"msg-err")+'">'+DSID.escapeHtml(t)+'</div>'; }
+
+  async function eliminarMascota(){
+    if (!editandoId) return;
+    if (!confirm("¿Seguro que quieres eliminar esta mascota?\n\nNo se puede deshacer y el QR de su placa dejará de funcionar.")) return;
+    const { error } = await sb.from("mascotas").delete().eq("id", editandoId);
+    if (error){ formMsg("Error al eliminar: " + error.message); return; }
+    verLista();
+  }
 
   async function guardar(){
     const nombre = document.getElementById("nombre").value.trim();
