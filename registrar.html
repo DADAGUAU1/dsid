@@ -13,14 +13,15 @@
 </head>
 <body>
 
-<div class="pin-gate" id="pinGate">
+<div class="pin-gate" id="authGate">
   <div class="pin-card">
     <div class="pin-ic">🔒</div>
     <h2>Panel del negocio</h2>
-    <p>Esta zona es privada. Ingresa el código de acceso para registrar mascotas y generar sus QR.</p>
-    <div class="pin-err" id="pinErr"></div>
-    <input type="password" id="pinInput" inputmode="numeric" placeholder="••••" maxlength="12" autocomplete="off">
-    <button class="btn" onclick="verificarPin()">Entrar</button>
+    <p>Acceso exclusivo para administradores de DADAGUAU.</p>
+    <div class="pin-err" id="authErr"></div>
+    <input type="email" id="authEmail" placeholder="Correo de administrador" autocomplete="username">
+    <input type="password" id="authPass" placeholder="Contraseña" autocomplete="current-password">
+    <button class="btn" id="authBtn" onclick="entrarAdmin()">Entrar</button>
   </div>
 </div>
 
@@ -212,33 +213,52 @@ Minimum version required to store current data is: `+i+`.
 
   let sb = null, qrCanvas = null, urlActual = "";
 
-  /* ====== Código de acceso al panel (CÁMBIALO por el tuyo) ====== */
-  const PIN_PANEL = "2580";
-  /* ============================================================== */
-  function verificarPin(){
-    const v = document.getElementById("pinInput").value.trim();
-    if (v === PIN_PANEL){
-      sessionStorage.setItem("dsid_panel", "ok");
-      document.getElementById("pinGate").remove();
-    } else {
-      document.getElementById("pinErr").textContent = "Código incorrecto.";
-      document.getElementById("pinInput").value = "";
-    }
-  }
-  if (sessionStorage.getItem("dsid_panel") === "ok"){
-    document.getElementById("pinGate").remove();
-  } else {
-    const pi = document.getElementById("pinInput");
-    pi.addEventListener("keydown", function(e){ if (e.key === "Enter") verificarPin(); });
-    pi.focus();
-  }
+  /* ====== Correo del administrador del negocio ======
+     El MISMO correo que pusiste en admin.html. SOLO esa cuenta entra aquí. */
+  const ADMIN_EMAIL = "admin@dadaguau.com";
+  /* ================================================== */
 
-  // Avisar si falta configuración
+  // Crear el cliente (lo necesita el inicio de sesión)
   if (SUPABASE_URL.indexOf("PEGA_AQUI") === 0 || SUPABASE_KEY.indexOf("PEGA_AQUI") === 0) {
     document.getElementById("warn-config").style.display = "block";
   } else {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   }
+
+  async function aceptarSiEsAdmin(user){
+    if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()){
+      document.getElementById("authGate").remove();
+      return true;
+    }
+    await sb.auth.signOut();
+    return false;
+  }
+
+  async function entrarAdmin(){
+    const email = document.getElementById("authEmail").value.trim();
+    const pass  = document.getElementById("authPass").value;
+    const err   = document.getElementById("authErr");
+    const btn   = document.getElementById("authBtn");
+    err.textContent = "";
+    if (!email || !pass){ err.textContent = "Escribe tu correo y contraseña."; return; }
+    btn.disabled = true; btn.textContent = "Entrando...";
+    const { data, error } = await sb.auth.signInWithPassword({ email: email, password: pass });
+    btn.disabled = false; btn.textContent = "Entrar";
+    if (error){ err.textContent = "Correo o contraseña incorrectos."; return; }
+    const ok = await aceptarSiEsAdmin(data.user);
+    if (!ok){ err.textContent = "Esta cuenta no es de administrador."; document.getElementById("authPass").value = ""; }
+  }
+
+  (async function(){
+    if (!sb) return;
+    const { data } = await sb.auth.getSession();
+    if (data && data.session){ await aceptarSiEsAdmin(data.session.user); }
+    else {
+      const p = document.getElementById("authPass");
+      p.addEventListener("keydown", function(e){ if (e.key === "Enter") entrarAdmin(); });
+      document.getElementById("authEmail").focus();
+    }
+  })();
 
   // Vista previa de la foto
   document.getElementById("foto").addEventListener("change", function(e){

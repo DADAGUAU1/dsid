@@ -13,14 +13,15 @@
 </head>
 <body>
 
-<div class="pin-gate" id="pinGate">
+<div class="pin-gate" id="authGate">
   <div class="pin-card">
     <div class="pin-ic">🔒</div>
     <h2>Panel del negocio</h2>
-    <p>Esta zona es privada. Ingresa el código de acceso para administrar las mascotas y sus QR.</p>
-    <div class="pin-err" id="pinErr"></div>
-    <input type="password" id="pinInput" inputmode="numeric" placeholder="••••" maxlength="12" autocomplete="off">
-    <button class="btn" onclick="verificarPin()">Entrar</button>
+    <p>Acceso exclusivo para administradores de DADAGUAU.</p>
+    <div class="pin-err" id="authErr"></div>
+    <input type="email" id="authEmail" placeholder="Correo de administrador" autocomplete="username">
+    <input type="password" id="authPass" placeholder="Contraseña" autocomplete="current-password">
+    <button class="btn" id="authBtn" onclick="entrarAdmin()">Entrar</button>
   </div>
 </div>
 
@@ -30,7 +31,10 @@
       <h1>🐾 DS ID — Panel</h1>
       <p>Todas tus mascotas registradas</p>
     </div>
-    <a href="registrar.html" class="btn-new">➕ Registrar nueva</a>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <a href="registrar.html" class="btn-new">➕ Registrar nueva</a>
+      <button onclick="cerrarSesion()" style="background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.32); border-radius:12px; padding:10px 15px; font-weight:600; font-family:var(--font); cursor:pointer;">Salir</button>
+    </div>
   </div>
 
   <div id="warn-config" class="warn" style="display:none;">
@@ -70,43 +74,65 @@ Minimum version required to store current data is: `+i+`.
   const SUPABASE_KEY = "sb_publishable_Hf-egqWEOiPiSs_fFR3eSQ_RFdHSZKg";
   /* ============================================================ */
 
-  /* ====== Código de acceso al panel (CÁMBIALO por el tuyo) ====== */
-  const PIN_PANEL = "2580";
-  /* ============================================================== */
+  /* ====== Correo del administrador del negocio ======
+     Pon aquí el correo de la cuenta de administrador que creas en Supabase
+     (PASO 5 del instructivo). SOLO esa cuenta podrá entrar al panel. */
+  const ADMIN_EMAIL = "admin@dadaguau.com";
+  /* ================================================== */
 
   let sb = null;
   const BASE = DSID.baseDir(location.href); // dirección del sitio, detectada sola
 
-  function arrancarPanel(){
-    if (SUPABASE_URL.indexOf("PEGA_AQUI") === 0){
-      document.getElementById("warn-config").style.display = "block";
-      document.getElementById("contenido").innerHTML = "";
-    } else {
-      sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      cargar();
-    }
-  }
-
-  function verificarPin(){
-    const v = document.getElementById("pinInput").value.trim();
-    if (v === PIN_PANEL){
-      sessionStorage.setItem("dsid_panel", "ok");
-      document.getElementById("pinGate").remove();
-      arrancarPanel();
-    } else {
-      document.getElementById("pinErr").textContent = "Código incorrecto.";
-      document.getElementById("pinInput").value = "";
-    }
-  }
-
-  if (sessionStorage.getItem("dsid_panel") === "ok"){
-    document.getElementById("pinGate").remove();
-    arrancarPanel();
+  // Creamos el cliente de una vez (lo necesita el inicio de sesión)
+  if (SUPABASE_URL.indexOf("PEGA_AQUI") === 0){
+    document.getElementById("warn-config").style.display = "block";
   } else {
-    const pi = document.getElementById("pinInput");
-    pi.addEventListener("keydown", function(e){ if (e.key === "Enter") verificarPin(); });
-    pi.focus();
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   }
+
+  function arrancarPanel(){
+    document.getElementById("authGate").remove();
+    cargar();
+  }
+
+  // Si esta cuenta es la del administrador, entra; si no, la cierra.
+  async function aceptarSiEsAdmin(user){
+    if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()){
+      arrancarPanel();
+      return true;
+    }
+    await sb.auth.signOut();
+    return false;
+  }
+
+  async function entrarAdmin(){
+    const email = document.getElementById("authEmail").value.trim();
+    const pass  = document.getElementById("authPass").value;
+    const err   = document.getElementById("authErr");
+    const btn   = document.getElementById("authBtn");
+    err.textContent = "";
+    if (!email || !pass){ err.textContent = "Escribe tu correo y contraseña."; return; }
+    btn.disabled = true; btn.textContent = "Entrando...";
+    const { data, error } = await sb.auth.signInWithPassword({ email: email, password: pass });
+    btn.disabled = false; btn.textContent = "Entrar";
+    if (error){ err.textContent = "Correo o contraseña incorrectos."; return; }
+    const ok = await aceptarSiEsAdmin(data.user);
+    if (!ok){ err.textContent = "Esta cuenta no es de administrador."; document.getElementById("authPass").value = ""; }
+  }
+
+  async function cerrarSesion(){ if (sb) await sb.auth.signOut(); location.reload(); }
+
+  // Al cargar: si ya hay una sesión de admin abierta, entra directo.
+  (async function(){
+    if (!sb) return;
+    const { data } = await sb.auth.getSession();
+    if (data && data.session){ await aceptarSiEsAdmin(data.session.user); }
+    else {
+      const p = document.getElementById("authPass");
+      p.addEventListener("keydown", function(e){ if (e.key === "Enter") entrarAdmin(); });
+      document.getElementById("authEmail").focus();
+    }
+  })();
 
   async function cargar(){
     const { data, error } = await sb.from("mascotas").select("*").order("created_at", { ascending:false });
@@ -178,8 +204,13 @@ Minimum version required to store current data is: `+i+`.
 
   async function eliminar(id, nombre){
     if (!(await DSIDUI.confirmar({titulo:"¿Eliminar a "+nombre+"?", texto:"Esta acción no se puede deshacer y el QR de su placa dejará de funcionar.", confirmar:"Eliminar", peligro:true}))) return;
-    const { error } = await sb.from("mascotas").delete().eq("id", id);
+    // .select() nos devuelve lo que realmente se borró: así sabemos si de verdad pasó.
+    const { data, error } = await sb.from("mascotas").delete().eq("id", id).select();
     if (error){ DSIDUI.toast("No se pudo eliminar: " + error.message,"err"); return; }
+    if (!data || data.length === 0){
+      DSIDUI.toast("No se eliminó. Revisa que entraste como administrador y los permisos de Supabase (PASO 5).","err");
+      return;
+    }
     const card = document.getElementById("pet-card-" + id);
     if (card) card.remove();
     const total = parseInt(document.getElementById("st-total").textContent) || 1;
