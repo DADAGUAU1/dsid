@@ -67,7 +67,7 @@ h1,h2,h3{ font-family:var(--font-display); font-weight:700; letter-spacing:-.02e
 
 /* ---------- Cabecera (chrome) ---------- */
 .head{
-  background:linear-gradient(145deg, var(--teal) 0%, var(--teal-deep) 100%);
+  background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http://www.w3.org/2000/svg%27%20width%3D%2786%27%20height%3D%2786%27%20viewBox%3D%270%200%2086%2086%27%3E%3Cg%20fill%3D%27%23ffffff%27%20fill-opacity%3D%270.045%27%3E%3Cellipse%20cx%3D%2743%27%20cy%3D%2750%27%20rx%3D%2712%27%20ry%3D%279%27/%3E%3Ccircle%20cx%3D%2725%27%20cy%3D%2733%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2736%27%20cy%3D%2725%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2725%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2761%27%20cy%3D%2733%27%20r%3D%275%27/%3E%3C/g%3E%3C/svg%3E") repeat, linear-gradient(145deg, var(--teal) 0%, var(--teal-deep) 100%);
   color:#fff; padding:22px 24px; position:relative;
 }
 .head::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:3px;
@@ -158,7 +158,7 @@ input:checked + .slider:before{ transform:translateX(21px); }
 /* ============================================================
    PERFIL PÚBLICO (la página que se escanea) — aspecto premium
    ============================================================ */
-.profile-head{ background:linear-gradient(160deg, var(--teal) 0%, var(--teal-deep) 92%); color:#fff; padding:30px 24px 26px; text-align:center; position:relative; overflow:hidden; }
+.profile-head{ background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http://www.w3.org/2000/svg%27%20width%3D%2786%27%20height%3D%2786%27%20viewBox%3D%270%200%2086%2086%27%3E%3Cg%20fill%3D%27%23ffffff%27%20fill-opacity%3D%270.045%27%3E%3Cellipse%20cx%3D%2743%27%20cy%3D%2750%27%20rx%3D%2712%27%20ry%3D%279%27/%3E%3Ccircle%20cx%3D%2725%27%20cy%3D%2733%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2736%27%20cy%3D%2725%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2725%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2761%27%20cy%3D%2733%27%20r%3D%275%27/%3E%3C/g%3E%3C/svg%3E") repeat, linear-gradient(160deg, var(--teal) 0%, var(--teal-deep) 92%); color:#fff; padding:30px 24px 26px; text-align:center; position:relative; overflow:hidden; }
 .profile-head::before{ content:""; position:absolute; top:-40%; right:-20%; width:240px; height:240px; background:radial-gradient(circle, rgba(255,106,61,.20), transparent 70%); }
 .profile-head::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:4px; background:linear-gradient(90deg, var(--brand), #FFB088); }
 .avatar{ width:122px; height:122px; border-radius:50%; margin:0 auto 14px; background:rgba(255,255,255,.14); border:4px solid rgba(255,255,255,.92); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:58px; box-shadow:0 10px 30px rgba(0,0,0,.22); position:relative; z-index:1; }
@@ -217,7 +217,7 @@ input:checked + .slider:before{ transform:translateX(21px); }
 /* ============================================================
    PANEL ADMIN / LISTAS
    ============================================================ */
-.top{ background:linear-gradient(145deg, var(--teal), var(--teal-deep)); color:#fff; padding:22px 24px; border-radius:var(--r-lg); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; position:relative; overflow:hidden; box-shadow:var(--shadow); }
+.top{ background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http://www.w3.org/2000/svg%27%20width%3D%2786%27%20height%3D%2786%27%20viewBox%3D%270%200%2086%2086%27%3E%3Cg%20fill%3D%27%23ffffff%27%20fill-opacity%3D%270.045%27%3E%3Cellipse%20cx%3D%2743%27%20cy%3D%2750%27%20rx%3D%2712%27%20ry%3D%279%27/%3E%3Ccircle%20cx%3D%2725%27%20cy%3D%2733%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2736%27%20cy%3D%2725%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2725%27%20r%3D%275%27/%3E%3Ccircle%20cx%3D%2761%27%20cy%3D%2733%27%20r%3D%275%27/%3E%3C/g%3E%3C/svg%3E") repeat, linear-gradient(145deg, var(--teal), var(--teal-deep)); color:#fff; padding:22px 24px; border-radius:var(--r-lg); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; position:relative; overflow:hidden; box-shadow:var(--shadow); }
 .top::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:3px; background:linear-gradient(90deg, var(--brand), #FFB088); }
 .top h1{ color:#fff; font-size:21px; display:flex; align-items:center; gap:9px; }
 .top p{ font-size:13px; color:rgba(255,255,255,.82); margin-top:3px; }
@@ -293,6 +293,15 @@ input:checked + .slider:before{ transform:translateX(21px); }
 .modal .m-btns .btn{ margin-top:0; }
 @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
 @keyframes modalIn{ from{ opacity:0; transform:translateY(12px) scale(.96); } to{ opacity:1; transform:translateY(0) scale(1); } }
+
+/* ---------- Código de acceso al panel privado ---------- */
+.pin-gate{ position:fixed; inset:0; z-index:10000; background:linear-gradient(160deg, var(--teal) 0%, var(--teal-deep) 100%); display:flex; align-items:center; justify-content:center; padding:24px; }
+.pin-card{ background:var(--cloud); border-radius:var(--r-lg); box-shadow:var(--shadow-lg); padding:32px 26px; max-width:360px; width:100%; text-align:center; }
+.pin-ic{ width:60px; height:60px; border-radius:50%; background:var(--teal-tint); color:var(--teal-deep); display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 16px; }
+.pin-card h2{ font-size:21px; margin-bottom:6px; }
+.pin-card p{ color:var(--muted); font-size:13.5px; margin-bottom:20px; line-height:1.5; }
+.pin-card input{ text-align:center; font-size:20px; letter-spacing:6px; font-family:var(--mono); }
+.pin-err{ color:var(--danger); font-size:13px; min-height:18px; margin-bottom:8px; }
 
 /* ---------- Accesibilidad / responsive ---------- */
 :focus-visible{ outline:2px solid var(--teal); outline-offset:2px; border-radius:4px; }

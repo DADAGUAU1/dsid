@@ -13,6 +13,17 @@
 </head>
 <body>
 
+<div class="pin-gate" id="pinGate">
+  <div class="pin-card">
+    <div class="pin-ic">🔒</div>
+    <h2>Panel del negocio</h2>
+    <p>Esta zona es privada. Ingresa el código de acceso para administrar las mascotas y sus QR.</p>
+    <div class="pin-err" id="pinErr"></div>
+    <input type="password" id="pinInput" inputmode="numeric" placeholder="••••" maxlength="12" autocomplete="off">
+    <button class="btn" onclick="verificarPin()">Entrar</button>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="top">
     <div>
@@ -59,15 +70,42 @@ Minimum version required to store current data is: `+i+`.
   const SUPABASE_KEY = "sb_publishable_Hf-egqWEOiPiSs_fFR3eSQ_RFdHSZKg";
   /* ============================================================ */
 
+  /* ====== Código de acceso al panel (CÁMBIALO por el tuyo) ====== */
+  const PIN_PANEL = "2580";
+  /* ============================================================== */
+
   let sb = null;
   const BASE = DSID.baseDir(location.href); // dirección del sitio, detectada sola
 
-  if (SUPABASE_URL.indexOf("PEGA_AQUI") === 0){
-    document.getElementById("warn-config").style.display = "block";
-    document.getElementById("contenido").innerHTML = "";
+  function arrancarPanel(){
+    if (SUPABASE_URL.indexOf("PEGA_AQUI") === 0){
+      document.getElementById("warn-config").style.display = "block";
+      document.getElementById("contenido").innerHTML = "";
+    } else {
+      sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      cargar();
+    }
+  }
+
+  function verificarPin(){
+    const v = document.getElementById("pinInput").value.trim();
+    if (v === PIN_PANEL){
+      sessionStorage.setItem("dsid_panel", "ok");
+      document.getElementById("pinGate").remove();
+      arrancarPanel();
+    } else {
+      document.getElementById("pinErr").textContent = "Código incorrecto.";
+      document.getElementById("pinInput").value = "";
+    }
+  }
+
+  if (sessionStorage.getItem("dsid_panel") === "ok"){
+    document.getElementById("pinGate").remove();
+    arrancarPanel();
   } else {
-    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    cargar();
+    const pi = document.getElementById("pinInput");
+    pi.addEventListener("keydown", function(e){ if (e.key === "Enter") verificarPin(); });
+    pi.focus();
   }
 
   async function cargar(){
